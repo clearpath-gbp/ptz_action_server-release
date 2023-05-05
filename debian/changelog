@@ -1,0 +1,25 @@
+ros-noetic-axis-ptz-action-server (0.1.2-1focal) focal; urgency=high
+
+  * Re-send the axis command if the camera isn't moving after 5s
+  * Add some additional logging, handle camera disconnections better
+  * Abort the action in-progress if the Axis camera stops publishing state messages
+  * Use format strings instead of .format
+  * Contributors: Chris Iverach-Brereton
+
+ -- Chris Iverach-Brereton <civerachb@clearpathrobotics.com>  Fri, 05 May 2023 04:00:00 -0000
+
+ros-noetic-axis-ptz-action-server (0.1.1-1focal) focal; urgency=high
+
+  * Add limits files for the standard dome camera & Q62 series. Add a new launch argument to specify the limits file
+  * Contributors: Chris Iverach-Brereton
+
+ -- Chris Iverach-Brereton <civerachb@clearpathrobotics.com>  Tue, 11 Apr 2023 04:00:00 -0000
+
+ros-noetic-axis-ptz-action-server (0.1.0-1focal) focal; urgency=high
+
+  * Initial release
+  * Contributors: Chris Iverach-Brereton
+
+ -- Chris Iverach-Brereton <civerachb@clearpathrobotics.com>  Mon, 27 Mar 2023 04:00:00 -0000
+
+
