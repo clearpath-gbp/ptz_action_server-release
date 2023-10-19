@@ -2,6 +2,11 @@
 Changelog for package ptz_action_server_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.5 (2023-10-19)
+------------------
+* Changes
+* Contributors: Chris Iverach-Brereton
+
 0.1.4 (2023-08-18)
 ------------------
 
