@@ -1,211 +1,62 @@
-simulated_ptz_action_server
-============================
+PTZ Action Server
+===================
 
-This package contains a simple ROS node to simulate the action server interface for a PTZ camera.
+This repo contains both generic action messages for controlling PTZ and PTU devices, as well as
+middle-ware ROS packages designed to wrap hardware/vendor-specific drivers and provide a more universal
+interface
 
-The node interacts with PTZ controllers to move the camera inside Gazebo, and implements a basic digital zoom
-with OpenCV to allow zooming.  (Gazebo cameras have fixed fields of view and cannot normally zoom at all)
 
-Usage
-------
+ptz_action_server_msgs
+-------------------
 
-At its most basic, this node can be used to control an already-configured URDF by simply running
+This package contains the core ActionLib compatible messages that compatible ROS nodes should use.  To allow easy
+inter-operability, the action server should be implemented to support these conditions, regardless of the underlying
+hardware:
 
-```bash
-roslaunch simulated_ptz_action_server simulated_ptz_action_server.launch
+- pan and tilt are expressed in radians
+- pan has a maximum allowable range of -pi to +pi, though cameras with a restricted field of motion may support
+  a subset of that range
+- tilt has a maximum allowable range of -pi/2 to +pi/2, though cameras with a restricted field of motion may suport
+  a subset of that range
+- positive pan indicates counter-clockwise rotation, negative pan indicates clockwise rotation when the camera is viewed
+  from above
+- positive tilt will pitch the camera upwards, negative tilt will pitch the camera downwards
+- zoom is the X-factor of the camera's zoom range. For example, a camera with a 1-24x zoom shall accept zoom values
+  in the range of 1-24.
+- if the camera does not support zoom (e.g. the Flir D46 PTU), the zoom field is ignored
+- while the action is ongoing feedback shall be published at no less than 1Hz, underlying hardware permitting
+- preemption should be allowed if possible, but may not be supported by the underlying hardware.
+- the action server will publish the state of the PTZ camera in the above logical angles/ranges at a rate of no less
+  than 1Hz.
+
+The main action server uses the following message format:
+```
+# Ptz.action
+float32 pan
+float32 tilt
+float32 zoom
+---
+bool success
+---
+float32 pan_remaining
+float32 tilt_remaining
+float32 zoom_remaining
 ```
 
-The digitally-zoomed camera data will be available on `/sensor/camera_0/image_raw` and the PTZ actions are
-available in `/sensors/camera_0/move_ptz`.
+The current state of the camera is reported using the following message format:
+```
+# PtzPosition.msg
+float32 pan
+float32 tilt
+float32 zoom
 
-To control the camera, simply connect your `actionlib` client to the `/sensors/camera_0/move_ptz` action.
-
-
-URDF Configuration & PID Controllers
--------------------------------------
-
-To use the node you must configure your URDF to include a compatible PTZ camera.  At minimum you must define revolute
-or continuous joints for the pan & tilt actuators, and include a Gazebo camera plugin to provide the image data.
-
-Below is an example of how this could be configured. Note that for Gazebo to recognize the camera joints both
-links must have physical properties.
-
-```xml
-<!--
-  The main body of the camera, mounted to the robot.
--->
-<link name="ptz_camera_base_link">
-  <inertial>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <mass value="1" />
-    <inertia
-      ixx="1.0" ixy="0.0" ixz="0.0"
-      iyy="1.0" iyz="0.0"
-      izz="1.0" />
-  </inertial>
-  <visual>
-    <geometry>
-      <mesh filename="package://my_camera_description/meshes/body.dae" scale="0.001 0.001 0.001" />
-    </geometry>
-    <material name="black" />
-    <origin xyz="0 0 0" rpy="0 0 ${pi/2}" />
-  </visual>
-  <collision>
-    <geometry>
-      <mesh filename="package://my_camera_description/meshes/body.stl" scale="0.001 0.001 0.001" />
-    </geometry>
-    <origin xyz="0 0 0" rpy="0 0 ${pi/2}" />
-  </collision>
-</link>
-<joint name="ptz_camera_base_joint" type="fixed">
-  <parent link="base_link" />
-  <child link="ptz_camera_base_link" />
-  <origin xyz="0 0 0.2" rpy="0 0 0" />
-</joint>
-
-<!--
-  The pan joint. This can be continuous or revolute with angle limits
--->
-<link name="ptz_camera_pan_link">
-  <inertial>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <mass value="1" />
-    <inertia
-      ixx="1.0" ixy="0.0" ixz="0.0"
-      iyy="1.0" iyz="0.0"
-      izz="1.0" />
-  </inertial>
-</link>
-<joint name="ptz_camera_pan_joint" type="continuous">
-  <axis xyz="0 0 1" />
-  <parent link="ptz_camera_base_link" />
-  <child link="ptz_camera_pan_link" />
-  <origin xyz="0 0 0.15" rpy="0 0 0" />
-</joint>
-<transmission name="ptz_camera_pan_trans">
-  <type>transmission_interface/SimpleTransmission</type>
-  <joint name="ptz_camera_pan_joint">
-    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-  </joint>
-  <actuator name="ptz_camera_pan_actuator">
-      <mechanicalReduction>1</mechanicalReduction>
-  </actuator>
-</transmission>
-
-<!--
-  The camera's tilting mechanism
-  Typically this joint will be revolute with angle limits, but it could be continuous
-  if your camera allows full 360-degree tilting
--->
-<link name="ptz_camera_tilt_link">
-  <inertial>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <mass value="1" />
-    <inertia
-      ixx="1.0" ixy="0.0" ixz="0.0"
-      iyy="1.0" iyz="0.0"
-      izz="1.0" />
-  </inertial>
-  <visual>
-    <geometry>
-      <mesh filename="package://my_camera_description/meshes/head.dae" scale="0.001 0.001 0.001" />
-    </geometry>
-    <material name="black" />
-    <origin xyz="0 0 0" rpy="0 0 ${pi/2}" />
-  </visual>
-  <collision>
-    <geometry>
-      <mesh filename="package://my_camera_description/meshes/head.stl" scale="0.001 0.001 0.001" />
-    </geometry>
-    <origin xyz="0 0 0" rpy="0 0 ${pi/2}" />
-  </collision>
-</link>
-<joint name="ptz_camera_tilt_joint" type="revolute">
-  <axis xyz="0 1 0" />
-  <limit lower="-1.5707963267948966" upper="0.5235987755982988" effort="1" velocity="1" />
-  <parent link="ptz_camera_pan_link" />
-  <child link="ptz_camera_tilt_link" />
-  <origin xyz="0 0 0" rpy="${pi} 0 0" />
-</joint>
-<transmission name="ptz_camera_tilt_trans">
-  <type>transmission_interface/SimpleTransmission</type>
-  <joint name="ptz_camera_tilt_joint">
-    <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-  </joint>
-  <actuator name="ptz_camera_tilt_actuator">
-      <mechanicalReduction>1</mechanicalReduction>
-  </actuator>
-</transmission>
-
-<!--
-  The camera lens link
-  This is the frame that the camera plugin uses to determine the camera's FoV
--->
-<link name="ptz_camera_link" />
-<joint name="ptz_camera_joint" type="fixed">
-  <parent link="ptz_camera_tilt_link" />
-  <child link="ptz_camera_link" />
-  <origin xyz="0.07 0 0" rpy="-${pi} 0 0" />
-</joint>
-<gazebo reference="ptz_camera_link">
-  <sensor type="camera" name="ptz_camera">
-    <update_rate>15</update_rate>
-    <camera>
-      <horizontal_fov>1.5184351666666667</horizontal_fov>
-      <vertical_fov>1.0122901111111111</vertical_fov>
-      <image>
-        <width>640</width>
-        <height>480</height>
-        <format>R8G8B8</format>
-      </image>
-      <clip>
-        <near>0.05</near>
-        <far>500.0</far>
-      </clip>
-    </camera>
-    <plugin name="ptz_camera_controller" filename="libgazebo_ros_camera.so">
-      <alwaysOn>true</alwaysOn>
-      <cameraName>/sensors/camera_0</cameraName>
-      <!--
-        We use the image_raw_nozoom topic because the PTZ action server node will publish image_raw
-        with a digital zoom applied
-      -->
-      <imageTopicName>image_raw_nozoom</imageTopicName>
-      <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-      <frameName>ptz_camera_link</frameName>
-    </plugin>
-  </sensor>
-</gazebo>
 ```
 
-You must launch the PID controllers to control the pan & tilt joints as well:
 
-```xml
-<launch>
-  <rosparam command="load" file="$(find simulated_ptz_action_server)/config/ptz_controllers.yaml" />
-  <node name="ptz_action_server_spawner" pkg="controller_manager" type="spawner"
-        args="pan_position_controller tilt_position_controller"/>
-</launch>
-```
+Supported Implementations
+--------------------------
 
-where the `ptz_controllers.yaml` file contains the following:
-
-```yaml
-pan_position_controller:
-  type: "velocity_controllers/JointPositionController"
-  joint: "ptz_camera_pan_joint"
-  pid:
-    p: 1.0
-    i: 0.01
-    d: 0.1
-
-tilt_position_controller:
-  type: "velocity_controllers/JointPositionController"
-  joint: "ptz_camera_tilt_joint"
-  pid:
-    p: 5.0
-    i: 0.01
-    d: 1.0
-```
-
-If you have multiple PTZ cameras, each one must have its own controllers
+This repository contains action server implementations that communicate with underlying ROS hardware drivers:
+- axiz_ptz_action_server: interacts with the axis_camera driver, supporting most Axis PTZ cameras that use ethernet
+- flir_ptu_action_server: interacts with the Flir D46 and E46 PTUs, supported by the flir_ptu package, either over serial
+  or ethernet.
