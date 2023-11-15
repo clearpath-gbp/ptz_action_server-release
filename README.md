@@ -1,3 +1,30 @@
+## ptz_action_server (noetic) - 0.1.6-1
+
+The packages in the `ptz_action_server` repository were released into the `noetic` distro by running `/usr/bin/bloom-release -t noetic -r noetic ptz_action_server` on `Wed, 15 Nov 2023 16:15:40 -0000`
+
+These packages were released:
+- `axis_ptz_action_server`
+- `flir_ptu_action_server`
+- `ptz_action_server_msgs`
+- `simulated_ptz_action_server`
+
+Version of package(s) in repository `ptz_action_server`:
+
+- upstream repository: https://github.com/clearpathrobotics/ptz_action_server.git
+- release repository: https://github.com/clearpath-gbp/ptz_action_server-release.git
+- rosdistro version: `0.1.5-1`
+- old version: `0.1.5-1`
+- new version: `0.1.6-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.2`
+- catkin_pkg version: `1.0.0`
+- rosdep version: `0.22.2`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## ptz_action_server (noetic) - 0.1.5-1
 
 The packages in the `ptz_action_server` repository were released into the `noetic` distro by running `/usr/bin/bloom-release -t noetic -r noetic ptz_action_server` on `Thu, 19 Oct 2023 21:22:51 -0000`
