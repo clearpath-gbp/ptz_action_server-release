@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>simulated_ptz_action_server</name>
-  <version>0.1.5</version>
+  <version>0.1.6</version>
   <description>Controller node for a simulated PTZ camera</description>
 
   <maintainer email="civerachb@clearpathrobotics.com">Chris Iverach-Brereton</maintainer>
@@ -17,6 +17,10 @@
   <exec_depend>rospy</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend>tf2</exec_depend>
+  <exec_depend>tf2_geometry_msgs</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
 
   <export>
   </export>
