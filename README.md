@@ -1,69 +1,50 @@
-PTZ Action Server
+axis_ptz_action_server
 ===================
 
-This repo contains both generic action messages for controlling PTZ and PTU devices, as well as
-middle-ware ROS packages designed to wrap hardware/vendor-specific drivers and provide a more universal
-interface
+This package provides `ptz_action_server_msgs`-compatible actions for the Axis PTZ cameras
+
+Requires `axis_camera` (https://github.com/ros-drivers/axis_camera) to be running to provide base-level
+hardware control.
 
 
-ptz_action_server_msgs
--------------------
+Parameters
+-----------
 
-This package contains the core ActionLib compatible messages that compatible ROS nodes should use.  To allow easy
-inter-operability, the action server should be implemented to support these conditions, regardless of the underlying
-hardware:
-
-- pan and tilt are expressed in radians
-- pan has a maximum allowable range of -pi to +pi, though cameras with a restricted field of motion may support
-  a subset of that range
-- tilt has a maximum allowable range of -pi/2 to +pi/2, though cameras with a restricted field of motion may suport
-  a subset of that range
-- positive pan indicates clockwise rotation, negative pan indicates anticlockwise rotation when the camera is viewed
-  from above
-- positive tilt will pitch the camera upwards, negative tilt will pitch the camera downwards
-- zoom is the X-factor of the camera's zoom range. For example, a camera with a 1-24x zoom shall accept zoom values
-  in the range of 1-24.
-- if the camera does not support zoom (e.g. the Flir D46 PTU), the zoom field is ignored
-- while the action is ongoing feedback shall be published at no less than 1Hz, underlying hardware permitting
-- preemption should be allowed if possible, but may not be supported by the underlying hardware.
-- the action server will publish the state of the PTZ camera in the above logical angles/ranges at a rate of no less
-  than 1Hz.
-
-The main action server uses the following message format:
-```
-# Ptz.action
-float32 pan
-float32 tilt
-float32 zoom
----
-bool success
----
-float32 pan_remaining
-float32 tilt_remaining
-float32 zoom_remaining
-```
-
-The current state of the camera is reported using the following message format:
-```
-# PtzState.msg
-int8 MODE_IDLE=0
-int8 MODE_POSITION=1
-int8 MODE_VELOCITY=2
-
-int8 mode
-
-float32 pan
-float32 tilt
-float32 zoom
-```
-
-Regardless of the operating mode, the `pan`, `tilt`, and `zoom` fields report the current positions of the camera.
+The `axis_ptz_action_server_node` takes the following parameters:
+- `cmd_ns` -- the namespace for the `axis_camera` node's commands. Default: `/axis/cmd`
+- `status_topic` -- the topic for the `axis_camera` node's position status topic. Default: `/axis/state/position`
+- `act_ns` -- the namespace to publish the PTZ actions in. Default: `/axis`.
+- `publish_joint_states`: if true, the action server will publish the pan & tilt angles to `/joint_states`. Default: `true`
+- `pan_joint`: the name of the pan joint in the URDF. Default: `$(camera_name)_pan_joint`
+- `tilt_joint`: the name of the tilt joint in the URDF. Default: `$(camera_name)_tilt_joint`
 
 
-Supported Implementations
---------------------------
+Usage
+------
 
-This repository contains action server implementations that communicate with underlying ROS hardware drivers:
-- axiz_ptz_action_server: interacts with the axis_camera driver, supporting most Axis PTZ cameras that use ethernet
-- flir_ptu_action_server: interacts with the Flir D46 and E46 PTUs, supported by the flir_ptu package, either over serial
-  or ethernet.
+The `axis_ptz_action_server_node` publishes 3 actionlib servers:
+- `$(act_ns)/move_ptz/position_abs`: send an absolute pan/tilt/zoom position to the camera
+- `$(act_ns)/move_ptz/position_rel`: send a pan/tilt/zoom position relative to the camera's current position
+- `$(act_ns)/move_ptz/velocity`: send velocity control commands to the camera
+
+Pan and tilt values are expressed in radians (or rad/s for velocity control).  Positive pan is to the left relative
+to the camera's base link (anticlockwise), and positive tilt is up.
+
+Position-based zoom levels are in the range `[1, X]` where X is the magnification level of the camera. e.g. a camera with
+a 5x zoom will accept values in the range `[1, 5]` and a 24x zoom will accept values in the range `[1, 24]`.
+
+Velocity-based zoom levels are in the range `[-100, 100]` where the value is the percentage of the camera's maximum
+zoom speed. i.e. `100` is equivalent to zooming in at `100%` of maximum speed and `-25` is equivalent to zooming out
+at `25%` of maximum speed.
+
+These limits can be reconfigured. See `config/limits_dome.yaml` and `config/limits_q62` for examples.
+
+
+Published Topics
+-----------------
+
+The node provides the `move_ptz` action with its corresponding `goal`, `feedback`, `result`, and `cancel` topics
+in the namespace defined by `act_ns` as described above.
+
+The node subscribes to the `status_topic` and republishes the PTZ state in `{act_ns}/ptz_state` using the
+`ptz_action_server_msgs/PtzPosition` message type.
