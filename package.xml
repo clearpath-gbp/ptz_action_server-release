@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>flir_ptu_action_server</name>
-  <version>0.1.6</version>
+  <version>0.1.7</version>
   <description>PTZ control services for the Flir D46 and E46 PTU devices</description>
 
   <maintainer email="civerachb@clearpathrobotics.com">Chris Iverach-Brereton</maintainer>
@@ -9,12 +9,12 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <exec_depend>actionlib</exec_depend>
-  <exec_depend>flir_ptu_driver</exec_depend>
-  <exec_depend>ptz_action_server_msgs</exec_depend>
-  <exec_depend>rospy</exec_depend>
-  <exec_depend>sensor_msgs</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
+  <depend>actionlib</depend>
+  <depend>flir_ptu_driver</depend>
+  <depend>ptz_action_server_msgs</depend>
+  <depend>rospy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
 
   <export>
   </export>

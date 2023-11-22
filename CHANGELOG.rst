@@ -2,6 +2,11 @@
 Changelog for package flir_ptu_action_server
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.7 (2023-11-22)
+------------------
+* Fix the dependencies for the Flir PTU action server
+* Contributors: Chris Iverach-Brereton
+
 0.1.6 (2023-11-15)
 ------------------
 * Major overhaul to add new control modes (`#4 <https://github.com/clearpathrobotics/ptz_action_server/issues/4>`_)
