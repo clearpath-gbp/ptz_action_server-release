@@ -1,3 +1,26 @@
+## ptz_action_server (humble) - 2.0.1-1
+
+The packages in the `ptz_action_server` repository were released into the `humble` distro by running `/usr/bin/bloom-release -t humble -r humble --new-track ptz_action_server` on `Thu, 23 May 2024 18:38:50 -0000`
+
+The `ptz_action_server_msgs` package was released.
+
+Version of package(s) in repository `ptz_action_server`:
+
+- upstream repository: https://github.com/clearpathrobotics/ptz_action_server.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `2.0.1-1`
+
+Versions of tools used:
+
+- bloom version: `0.12.0`
+- catkin_pkg version: `1.0.0`
+- rosdep version: `0.24.0`
+- rosdistro version: `0.9.1`
+- vcstools version: `0.1.42`
+
+
 ## ptz_action_server (noetic) - 0.1.9-1
 
 The packages in the `ptz_action_server` repository were released into the `noetic` distro by running `/usr/bin/bloom-release -t noetic -r noetic ptz_action_server` on `Tue, 09 Jan 2024 14:53:08 -0000`
