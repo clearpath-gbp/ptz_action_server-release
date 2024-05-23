@@ -2,6 +2,14 @@
 Changelog for package ptz_action_server_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.0.1 (2024-05-23)
+------------------
+
+2.0.0 (2024-05-23)
+------------------
+* Initial release for ROS 2
+* Contributors: Chris Iverach-Brereton, Michael Hosmar
+
 0.1.9 (2024-01-09)
 ------------------
 
