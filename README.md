@@ -1,3 +1,26 @@
+## ptz_action_server (jazzy) - 2.0.4-1
+
+The packages in the `ptz_action_server` repository were released into the `jazzy` distro by running `/usr/bin/bloom-release ptz_action_server -t jazzy -r jazzy` on `Mon, 26 Oct 2026 19:02:38 -0000`
+
+The `ptz_action_server_msgs` package was released.
+
+Version of package(s) in repository `ptz_action_server`:
+
+- upstream repository: https://github.com/clearpathrobotics/ptz_action_server.git
+- release repository: https://github.com/clearpath-gbp/ptz_action_server-release.git
+- rosdistro version: `2.0.3-1`
+- old version: `2.0.3-1`
+- new version: `2.0.4-1`
+
+Versions of tools used:
+
+- bloom version: `0.14.4`
+- catkin_pkg version: `1.1.1`
+- rosdep version: `0.27.0`
+- rosdistro version: `1.1.0`
+- vcstools version: `0.1.42`
+
+
 ## ptz_action_server (jazzy) - 2.0.3-1
 
 The packages in the `ptz_action_server` repository were released into the `jazzy` distro by running `/usr/bin/bloom-release -t jazzy -r jazzy ptz_action_server` on `Fri, 01 Nov 2024 16:39:51 -0000`
